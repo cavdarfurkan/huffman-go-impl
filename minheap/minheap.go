@@ -5,9 +5,10 @@ import (
 )
 
 type Node struct {
-	Char      rune
-	Frequency int // priority
-	index     int
+	Char        rune
+	Frequency   int // priority
+	Left, Right *Node
+	index       int
 }
 
 type MinHeap []*Node
@@ -40,6 +41,10 @@ func (mh *MinHeap) Pop() any {
 	item.index = -1
 	*mh = old[0 : n-1]
 	return item
+}
+
+func (mh MinHeap) PeekFirst() *Node {
+	return mh[0]
 }
 
 func (node Node) String() string {

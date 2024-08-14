@@ -103,21 +103,17 @@ func TestPop(t *testing.T) {
 	}
 }
 
-func TestNewNode(t *testing.T) {
-	var newNodeTests = []struct {
-		arg1   rune
-		arg2   int
-		wanted *Node
+func TestPeekFirst(t *testing.T) {
+	var peekFirstTests = []struct {
+		heap MinHeap
+		want *Node
 	}{
-		{'a', 5, &Node{Char: 'a', Frequency: 5}},
-		{'b', 1, &Node{Char: 'b', Frequency: 1}},
-		{'c', 3, &Node{Char: 'c', Frequency: 3}},
+		{testHeap, testHeap[0]},
 	}
 
-	for _, test := range newNodeTests {
-		got := Node{Char: test.arg1, Frequency: test.arg2}
-		if got.Char != test.wanted.Char || got.Frequency != test.wanted.Frequency {
-			t.Errorf("got:%v\twant:%v", got, test.wanted)
+	for _, test := range peekFirstTests {
+		if got := test.heap.PeekFirst(); got != test.want {
+			t.Errorf("got:%v\twant:%v", got, test.want)
 		}
 	}
 }
