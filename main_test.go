@@ -61,11 +61,11 @@ func TestGenerateNodes(t *testing.T) {
 	}
 
 	for _, test := range generateNodesTests {
-		nodes := test.freqTable.GenerateNodes()
+		nodes := test.freqTable.generateNodes()
 		nodesMap := make(map[rune]int, nodes.Len())
 
 		// Fill the nodesMap
-		for _, val := range nodes {
+		for _, val := range *nodes {
 			nodesMap[val.Char] = val.Frequency
 		}
 
@@ -85,8 +85,108 @@ func TestGenerateNodes(t *testing.T) {
 	}
 }
 
-// func TestBuildHuffmanTree(t *testing.T) {
-// var huffmanTreeTests = []struct {
-// 	nodes []*minheap.Node
-// }
-// }
+func TestBuildHuffmanTree(t *testing.T) {
+	var tests = []struct {
+		name           string
+		frequencyTable FrequencyTable
+		want           *minheap.MinHeap
+	}{
+		{
+			name:           "test 1",
+			frequencyTable: GenerateFrequencyTable("aaabbc"),
+			want: &minheap.MinHeap{
+				&minheap.Node{
+					Frequency: 6,
+					Left: &minheap.Node{
+						Char:      'a',
+						Frequency: 3,
+					},
+					Right: &minheap.Node{
+						Frequency: 3,
+						Left: &minheap.Node{
+							Char:      'b',
+							Frequency: 2,
+						},
+						Right: &minheap.Node{
+							Char:      'c',
+							Frequency: 1,
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := test.frequencyTable.BuildHuffmanTree()
+
+			// Unbelievable
+			if (got.Len() != test.want.Len()) ||
+				(got.PeekFirst().Frequency != test.want.PeekFirst().Frequency) ||
+				(got.PeekFirst().Left.Char != test.want.PeekFirst().Left.Char ||
+					got.PeekFirst().Left.Frequency != test.want.PeekFirst().Left.Frequency) ||
+				(got.PeekFirst().Right.Frequency != test.want.PeekFirst().Right.Frequency) ||
+				(got.PeekFirst().Right.Left.Char != test.want.PeekFirst().Right.Left.Char ||
+					got.PeekFirst().Right.Left.Frequency != test.want.PeekFirst().Right.Left.Frequency) ||
+				(got.PeekFirst().Right.Right.Char != test.want.PeekFirst().Right.Right.Char ||
+					got.PeekFirst().Right.Right.Frequency != test.want.PeekFirst().Right.Right.Frequency) {
+				t.Errorf("got: %v,%v,%v,%v,%v\twant:%v,%v,%v,%v,%v",
+					got.PeekFirst(), got.PeekFirst().Left, got.PeekFirst().Right, got.PeekFirst().Right.Left, got.PeekFirst().Right.Right,
+					test.want.PeekFirst(), test.want.PeekFirst().Left, test.want.PeekFirst().Right, test.want.PeekFirst().Right.Left, test.want.PeekFirst().Right.Right)
+			}
+		})
+	}
+}
+
+func TestEncode(t *testing.T) {
+	var tests = []struct {
+		name, input, want string
+	}{
+		{
+			name:  "encode test 1",
+			input: "aaabbc",
+			want:  "000101011",
+		},
+		{
+			name:  "encode empty string",
+			input: "",
+			want:  "",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := Encode(test.input)
+			if got != test.want {
+				t.Errorf("got: %s\twant: %s", got, test.want)
+			}
+		})
+	}
+}
+
+func TestDecode(t *testing.T) {
+	var tests = []struct {
+		name, input, want string
+	}{
+		{
+			name:  "decode test 1",
+			input: "000101011",
+			want:  "aaabbc",
+		},
+		{
+			name:  "decode empty string",
+			input: "",
+			want:  "",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			got := Encode(test.input)
+			if got != test.want {
+				t.Errorf("got: %s\twant: %s", got, test.want)
+			}
+		})
+	}
+}

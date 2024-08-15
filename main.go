@@ -16,7 +16,7 @@ func GenerateFrequencyTable(str string) FrequencyTable {
 	return freqTable
 }
 
-func (freqTable FrequencyTable) GenerateNodes() minheap.MinHeap {
+func (freqTable FrequencyTable) generateNodes() *minheap.MinHeap {
 	mh := make(minheap.MinHeap, 0, len(freqTable))
 	heap.Init(&mh)
 
@@ -24,23 +24,44 @@ func (freqTable FrequencyTable) GenerateNodes() minheap.MinHeap {
 		heap.Push(&mh, &minheap.Node{Char: key, Frequency: val})
 	}
 
+	return &mh
+}
+
+func (freqTable FrequencyTable) BuildHuffmanTree() *minheap.MinHeap {
+	mh := freqTable.generateNodes()
+	heap.Init(mh)
+
+	for mh.Len() > 1 {
+		node1 := heap.Pop(mh).(*minheap.Node)
+		node2 := heap.Pop(mh).(*minheap.Node)
+
+		var left, right *minheap.Node
+		if node1.Frequency < node2.Frequency {
+			left = node2
+			right = node1
+		} else {
+			left = node1
+			right = node2
+		}
+
+		newNode := &minheap.Node{
+			Frequency: node1.Frequency + node2.Frequency,
+			Left:      left,
+			Right:     right,
+		}
+
+		heap.Push(mh, newNode)
+	}
+
 	return mh
 }
 
-// func main() {
-// 	mh := make(minheap.MinHeap, 0)
-// 	heap.Init(&mh)
+func Encode(input string) string {
+	panic("Implement encode function")
+}
 
-// 	heap.Push(&mh, &minheap.Node{Char: 'a', Frequency: 5})
-// 	heap.Push(&mh, &minheap.Node{Char: 'b', Frequency: 1})
-// 	heap.Push(&mh, &minheap.Node{Char: 'c', Frequency: 3})
+func Decode(input string) string {
+	panic("Implement decode function")
+}
 
-// 	for mh.Len() > 0 {
-// 		n := heap.Pop(&mh).(*minheap.Node)
-// 		fmt.Print(n)
-// 	}
-// }
-
-// TODO: Generate huffman tree
-// TODO: Encode
-// TODO: Decode
+// https://cgi.luddy.indiana.edu/~yye/c343-2019/huffman.php
