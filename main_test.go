@@ -157,9 +157,9 @@ func TestEncode(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := Encode(test.input)
-			if got != test.want {
-				t.Errorf("got: %s\twant: %s", got, test.want)
+			got, _ := Encode(test.input)
+			if got.EncodedValue != test.want {
+				t.Errorf("got: %v\twant: %s", got.EncodedValue, test.want)
 			}
 		})
 	}
@@ -167,23 +167,36 @@ func TestEncode(t *testing.T) {
 
 func TestDecode(t *testing.T) {
 	var tests = []struct {
-		name, input, want string
+		name, want string
+		input      EncodedString
 	}{
 		{
-			name:  "decode test 1",
-			input: "000101011",
-			want:  "aaabbc",
+			name: "decode test 1",
+			input: EncodedString{
+				EncodedValue: "000101011",
+				Codes: func() CodeMap {
+					val, _ := generateCodes(*GenerateFrequencyTable("aaabbcc").BuildHuffmanTree())
+					return val
+				}(),
+			},
+			want: "aaabbc",
 		},
 		{
-			name:  "decode empty string",
-			input: "",
-			want:  "",
+			name: "decode empty string",
+			input: EncodedString{
+				EncodedValue: "",
+				Codes: func() CodeMap {
+					val, _ := generateCodes(*GenerateFrequencyTable("").BuildHuffmanTree())
+					return val
+				}(),
+			},
+			want: "",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := Encode(test.input)
+			got := Decode(test.input)
 			if got != test.want {
 				t.Errorf("got: %s\twant: %s", got, test.want)
 			}
