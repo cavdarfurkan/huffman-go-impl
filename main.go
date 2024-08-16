@@ -8,6 +8,7 @@ import (
 
 	"github.com/cavdarfurkan/huffman-go-impl/minheap"
 	"github.com/cavdarfurkan/huffman-go-impl/stack"
+	"github.com/vishalkuo/bimap"
 )
 
 type FrequencyTable map[rune]int
@@ -66,16 +67,14 @@ type nodeCodes struct {
 	code  string
 }
 
-// CodeMap is an alias for map[rune]string
-type CodeMap map[rune]string
-
-func generateCodes(mh minheap.MinHeap) (CodeMap, error) {
+func generateCodes(mh minheap.MinHeap) (*bimap.BiMap[rune, string], error) {
 	if mh.Len() != 1 {
-		return nil, errors.New("heap's size must be 1 to be able to generate codes")
+		return &bimap.BiMap[rune, string]{},
+			errors.New("heap's size must be 1 to be able to generate codes")
 	}
 
 	stack := make(stack.Stack, 0)
-	result := make(CodeMap, 0)
+	result := bimap.NewBiMap[rune, string]()
 
 	root := mh.PeekFirst()
 	stack.Push(nodeCodes{
@@ -92,7 +91,7 @@ func generateCodes(mh minheap.MinHeap) (CodeMap, error) {
 
 		if val, ok := nodeCode.(nodeCodes); ok {
 			if val.node.Char != 0 {
-				result[val.node.Char] = val.code
+				result.Insert(val.node.Char, val.code)
 			}
 
 			if val.node.Right != nil {
@@ -117,7 +116,7 @@ func generateCodes(mh minheap.MinHeap) (CodeMap, error) {
 
 type EncodedString struct {
 	EncodedValue string
-	Codes        CodeMap
+	Codes        *bimap.BiMap[rune, string]
 }
 
 func Encode(input string) (EncodedString, error) {
@@ -129,10 +128,11 @@ func Encode(input string) (EncodedString, error) {
 		return EncodedString{}, err
 	}
 
+	forwardCodes := codes.GetForwardMap()
 	var encodedString strings.Builder
 
 	for _, v := range input {
-		code := codes[v]
+		code := forwardCodes[v]
 		encodedString.WriteString(code)
 	}
 
@@ -146,12 +146,12 @@ func Decode(input EncodedString) string {
 	panic("Implement decode function")
 }
 
-func main() {
-	val, err := Encode("")
-	if err != nil {
-		fmt.Printf("err: %v\n", err)
-	}
-	fmt.Printf("val.EncodedValue: %v\n", val.EncodedValue)
-}
+// func main() {
+// 	val, err := Encode("aaabbc")
+// 	if err != nil {
+// 		fmt.Printf("err: %v\n", err)
+// 	}
+// 	fmt.Printf("val.EncodedValue: %v\n", val.EncodedValue)
+// }
 
 // https://cgi.luddy.indiana.edu/~yye/c343-2019/huffman.php

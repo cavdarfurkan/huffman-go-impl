@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/cavdarfurkan/huffman-go-impl/minheap"
+	"github.com/vishalkuo/bimap"
 )
 
 func TestFreqTable(t *testing.T) {
@@ -174,7 +175,7 @@ func TestDecode(t *testing.T) {
 			name: "decode test 1",
 			input: EncodedString{
 				EncodedValue: "000101011",
-				Codes: func() CodeMap {
+				Codes: func() *bimap.BiMap[rune, string] {
 					val, _ := generateCodes(*GenerateFrequencyTable("aaabbcc").BuildHuffmanTree())
 					return val
 				}(),
@@ -185,7 +186,7 @@ func TestDecode(t *testing.T) {
 			name: "decode empty string",
 			input: EncodedString{
 				EncodedValue: "",
-				Codes: func() CodeMap {
+				Codes: func() *bimap.BiMap[rune, string] {
 					val, _ := generateCodes(*GenerateFrequencyTable("").BuildHuffmanTree())
 					return val
 				}(),
