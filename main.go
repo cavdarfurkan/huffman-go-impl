@@ -111,6 +111,7 @@ func generateCodes(mh minheap.MinHeap) (*bimap.BiMap[rune, string], error) {
 		}
 	}
 
+	result.MakeImmutable()
 	return result, nil
 }
 
@@ -143,7 +144,20 @@ func Encode(input string) (EncodedString, error) {
 }
 
 func Decode(input EncodedString) string {
-	panic("Implement decode function")
+	inverseCodes := input.Codes.GetInverseMap()
+	var decodedString strings.Builder
+	var code strings.Builder
+
+	for _, c := range input.EncodedValue {
+		code.WriteRune(c)
+
+		if decodedRune, ok := inverseCodes[code.String()]; ok {
+			code.Reset()
+			decodedString.WriteRune(decodedRune)
+		}
+	}
+
+	return decodedString.String()
 }
 
 // func main() {
@@ -151,7 +165,10 @@ func Decode(input EncodedString) string {
 // 	if err != nil {
 // 		fmt.Printf("err: %v\n", err)
 // 	}
-// 	fmt.Printf("val.EncodedValue: %v\n", val.EncodedValue)
+// 	fmt.Printf("Encoded: %v\n", val.EncodedValue)
+
+// 	decodedVal := Decode(val)
+// 	fmt.Printf("Decoded: %v\n", decodedVal)
 // }
 
 // https://cgi.luddy.indiana.edu/~yye/c343-2019/huffman.php

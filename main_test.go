@@ -176,7 +176,7 @@ func TestDecode(t *testing.T) {
 			input: EncodedString{
 				EncodedValue: "000101011",
 				Codes: func() *bimap.BiMap[rune, string] {
-					val, _ := generateCodes(*GenerateFrequencyTable("aaabbcc").BuildHuffmanTree())
+					val, _ := generateCodes(*GenerateFrequencyTable("aaabbc").BuildHuffmanTree())
 					return val
 				}(),
 			},
